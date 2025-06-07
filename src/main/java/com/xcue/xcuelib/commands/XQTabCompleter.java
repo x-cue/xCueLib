@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Deprecated(forRemoval = true, since = "06/07/2025")
 public abstract class XQTabCompleter implements TabCompleter {
     @Nullable
     @Override

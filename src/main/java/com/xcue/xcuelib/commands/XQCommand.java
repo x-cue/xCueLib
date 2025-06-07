@@ -1,47 +1,78 @@
 package com.xcue.xcuelib.commands;
 
 import com.xcue.xcuelib.XQPlugin;
-import com.xcue.xcuelib.configuration.Config;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
-public abstract class XQCommand implements CommandExecutor {
-    protected final XQPlugin main;
-    protected final Config config;
-    public XQCommand(XQPlugin main) {
-        this.main = main;
-        this.config = main.getConfigs();
+/**
+ * Permission: Empty string = anyone can use it
+ */
+public abstract class XQCommand extends XQAbstractCommand implements CommandExecutor {
+    private final Map<String, XQAbstractCommand> subCommandMap;
+
+    public XQCommand(XQPlugin pl, String name) {
+        super(pl, name);
+        this.subCommandMap = new HashMap<>();
     }
-    protected abstract String getPermissionToReload();
 
-    @Override
-    public final boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        return executeCommand(commandSender, command, s, strings);
-    }
+    public final boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, String @NotNull [] args) {
+        String arg1 = "";
+        if (args.length >= 1) {
+            arg1 = args[0].toLowerCase();
+        }
+        XQAbstractCommand finalCmd = this.subCommandMap.getOrDefault(arg1, this);
 
-    public abstract boolean executeCommand(CommandSender sender, Command cmd, String label, String[] args);
-
-    protected final boolean reload(CommandSender sender, String successMsg, String permissionMsg) {
-        if (!hasPermission(sender, getPermissionToReload(), permissionMsg)) {
+        if (!finalCmd.hasPermission(sender)) {
+            send(sender, getPermissionMsg());
             return false;
         }
 
-        this.main.onReload();
+        if (!finalCmd.isValidSender(sender)) {
+            send(sender, getInvalidSenderMsg());
+            return false;
+        }
 
-        sender.sendMessage(successMsg);
+        // Check arg lengths
+        if ((requiresMinArgs && args.length < minArgs) || (limitedArgs && args.length > maxArgs)) {
+            send(sender, getUsageMsg());
+            return false;
+        }
 
-        return true;
+
+        // Remove first arg if subcommand
+        if (arg1.equals(finalCmd.name)) {
+            args = Arrays.copyOfRange(args, 1, args.length);
+        }
+
+        // Execute!
+        return dispatchByType(finalCmd, sender, args);
     }
 
-    protected final boolean hasPermission(@Nonnull CommandSender sender, @Nonnull String permission, String msg) {
-        if (sender.hasPermission(permission))
-            return true;
+    public void addCommand(XQSubCommand command) {
+        this.subCommandMap.put(command.name.toLowerCase(), command);
+    }
 
-        sender.sendMessage(msg);
+    private boolean dispatchByType(XQAbstractCommand cmd, CommandSender sender, String[] args) {
+        if (!cmd.allowConsole && !cmd.allowPlayer) {
+            throw new IllegalStateException(
+                    String.format("Command '%s' must allow either console or player execution.", cmd.name)
+            );
+        }
+
+        if (cmd.allowPlayer && cmd.allowConsole) return cmd.onDispatch(sender, args);
+        if (cmd.allowPlayer && sender instanceof Player) return cmd.onPlayerDispatch(sender, args);
+        if (cmd.allowConsole && sender instanceof ConsoleCommandSender) return cmd.onConsoleDispatch(sender, args);
 
         return false;
     }
+
 }
+
