@@ -87,9 +87,6 @@ public abstract class XQAbstractCommand {
         sender.sendMessage(msg);
     }
 
-    protected abstract TextComponent getPermissionMsg();
-    protected abstract TextComponent getInvalidSenderMsg();
-    protected abstract TextComponent getUsageMsg();
 //    		super("build",plugin);
 //    setDescription("Spawn in a building.");
 //    setUsage("/build");
