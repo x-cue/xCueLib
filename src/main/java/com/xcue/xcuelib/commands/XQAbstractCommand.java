@@ -72,6 +72,18 @@ public abstract class XQAbstractCommand {
         this.minArgs = amount;
     }
 
+    public void setAllowOpOverride(boolean val) {
+        this.allowOpOverride = val;
+    }
+
+    public void setAllowConsole(boolean val) {
+        this.allowConsole = val;
+    }
+
+    public void setAllowPlayer(boolean val) {
+        this.allowPlayer = val;
+    }
+
     protected final boolean isValidSender (CommandSender sender) {
         boolean validConsole = this.allowConsole && sender instanceof ConsoleCommandSender;
         boolean validPlayer = this.allowPlayer && sender instanceof Player;
