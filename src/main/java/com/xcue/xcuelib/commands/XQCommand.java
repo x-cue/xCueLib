@@ -1,6 +1,7 @@
 package com.xcue.xcuelib.commands;
 
 import com.xcue.xcuelib.XQPlugin;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -74,5 +75,8 @@ public abstract class XQCommand extends XQAbstractCommand implements CommandExec
         return false;
     }
 
+    protected abstract TextComponent getPermissionMsg();
+    protected abstract TextComponent getInvalidSenderMsg();
+    protected abstract TextComponent getUsageMsg();
 }
 
