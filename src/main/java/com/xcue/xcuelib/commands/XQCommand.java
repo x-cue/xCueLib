@@ -38,16 +38,15 @@ public abstract class XQCommand extends XQAbstractCommand implements CommandExec
             return false;
         }
 
-        // Check arg lengths
-        if ((requiresMinArgs && args.length < minArgs) || (limitedArgs && args.length > maxArgs)) {
-            send(sender, getUsageMsg());
-            return false;
-        }
-
-
         // Remove first arg if subcommand
         if (arg1.equals(finalCmd.name)) {
             args = Arrays.copyOfRange(args, 1, args.length);
+        }
+
+        // Check arg lengths
+        if ((finalCmd.requiresMinArgs && args.length < finalCmd.minArgs) || (finalCmd.limitedArgs && args.length > finalCmd.maxArgs)) {
+            send(sender, getUsageMsg());
+            return false;
         }
 
         // Execute!
