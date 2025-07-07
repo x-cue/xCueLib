@@ -9,6 +9,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class XQAbstractCommand {
     protected final Config config;
     protected final XQPlugin plugin;
@@ -36,11 +39,11 @@ public abstract class XQAbstractCommand {
         return (p.isEmpty()) || (allowOpOverride && sender.isOp()) || sender.hasPermission(getPermission());
     }
 
-    public boolean onConsoleDispatch(CommandSender sender, String[] args) {
+    public boolean onConsoleDispatch(ConsoleCommandSender sender, String[] args) {
         throw new NotImplementedException();
     }
 
-    public boolean onPlayerDispatch(CommandSender sender, String[] args) {
+    public boolean onPlayerDispatch(Player sender, String[] args) {
         throw new NotImplementedException();
     }
 
@@ -98,6 +101,8 @@ public abstract class XQAbstractCommand {
     protected void send(CommandSender sender, TextComponent msg) {
         sender.sendMessage(msg);
     }
+
+    protected abstract List<String> onTabComplete(CommandSender sender, String[] args);
 
 //    		super("build",plugin);
 //    setDescription("Spawn in a building.");
