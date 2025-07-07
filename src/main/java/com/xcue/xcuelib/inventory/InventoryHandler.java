@@ -19,7 +19,6 @@ public class InventoryHandler implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         if (event.getInventory().getHolder() != null && event.getInventory().getHolder() instanceof GUI) {
-            if (event.getInventory() == event.getInventory())
                 ((GUI) event.getInventory().getHolder()).onInventoryClose(event);
         }
     }
@@ -27,7 +26,6 @@ public class InventoryHandler implements Listener {
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent event) {
         if (event.getInventory().getHolder() != null && event.getInventory().getHolder() instanceof GUI) {
-            if (event.getInventory() == event.getInventory())
                 ((GUI) event.getInventory().getHolder()).onInventoryOpen(event);
         }
     }
