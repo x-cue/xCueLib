@@ -94,13 +94,16 @@ public abstract class XQCommand extends XQAbstractCommand implements CommandExec
             List<String> arg1Suggestions = new ArrayList<>();
 
             // Match subcommands with arg1
-            arg1Suggestions.addAll(TabCompleterUtils.filterMatches(arg1, new ArrayList<>(subCommandMap.keySet()),
-                    true));
+            for (XQAbstractCommand sub : subCommandMap.values()) {
+                if (sub.hasPermission(sender)) {
+                    arg1Suggestions.add(sub.name);
+                }
+            }
 
             // Add base command completion for arg1 as well
-            arg1Suggestions.addAll(TabCompleterUtils.filterMatches(arg1, onTabComplete(sender, args), true));
+            arg1Suggestions.addAll(onTabComplete(sender, args));
 
-            return arg1Suggestions;
+            return TabCompleterUtils.filterMatches(arg1, arg1Suggestions, true);
         }
 
         // Delegate actual tab completion
