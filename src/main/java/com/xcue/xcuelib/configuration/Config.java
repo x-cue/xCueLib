@@ -3,17 +3,14 @@ package com.xcue.xcuelib.configuration;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Config {
-    private final List<ConfigSource> sources;
+    private final Map<String, ConfigSource> sources;
     private final Map<String, ConfigValue<?>> cache;
 
     public Config() {
-        this.sources = new ArrayList<>();
+        this.sources = new HashMap<>();
         this.cache = new HashMap<>();
     }
 
@@ -22,18 +19,26 @@ public class Config {
         // TODO: Consider automatically repopulating each value in cache upon reload
         // TODO: This can be done by looping through each value and running get(key, value); after each source is
         //  reloaded...
-        for (ConfigSource source : sources) {
+        for (ConfigSource source : sources()) {
             source.reload();
         }
     }
 
-    public void addSource(ConfigSource source) {
-        this.sources.add(source);
+    private Collection<ConfigSource> sources() {
+        return this.sources.values();
+    }
+
+    public void addSource(String name, ConfigSource source) {
+        this.sources.put(name, source);
+    }
+
+    public ConfigSource removeSource(String name) {
+        return this.sources.remove(name);
     }
 
     @Nullable
     public <T> T get(@NonNull String path, @NonNull Class<T> clazz) {
-        for (ConfigSource source : sources) {
+        for (ConfigSource source : sources()) {
             if (source.isSet(path)) {
                 return source.getObject(path, clazz);
             }

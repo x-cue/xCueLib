@@ -50,14 +50,32 @@ public abstract class XQCommand extends XQAbstractCommand implements CommandExec
         }
 
         // Execute!
-        return dispatchByType(finalCmd, sender, args);
+        switch (dispatchByType(finalCmd, sender, args)) {
+            case SUCCESS:
+                return true;
+            case FAILURE:
+                return false;
+            case USAGE:
+                send(sender, getUsageMsg());
+                break;
+            case SENDER:
+                send(sender, getInvalidSenderMsg());
+                break;
+            case PERMISSION:
+                send(sender, getPermissionMsg());
+                break;
+            default:
+                break;
+        }
+
+        return false;
     }
 
     public void addCommand(XQSubCommand command) {
         this.subCommandMap.put(command.name.toLowerCase(), command);
     }
 
-    private boolean dispatchByType(XQAbstractCommand cmd, CommandSender sender, String[] args) {
+    private CommandResult dispatchByType(XQAbstractCommand cmd, CommandSender sender, String[] args) {
         if (!cmd.allowConsole && !cmd.allowPlayer) {
             throw new IllegalStateException(
                     String.format("Command '%s' must allow either console or player execution.", cmd.name)
@@ -68,7 +86,7 @@ public abstract class XQCommand extends XQAbstractCommand implements CommandExec
         if (cmd.allowPlayer && sender instanceof Player p) return cmd.onPlayerDispatch(p, args);
         if (cmd.allowConsole && sender instanceof ConsoleCommandSender c) return cmd.onConsoleDispatch(c, args);
 
-        return false;
+        return CommandResult.FAILURE;
     }
 
     protected abstract TextComponent getPermissionMsg();
