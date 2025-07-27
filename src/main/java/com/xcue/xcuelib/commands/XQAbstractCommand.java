@@ -39,15 +39,15 @@ public abstract class XQAbstractCommand {
         return (p.isEmpty()) || (allowOpOverride && sender.isOp()) || sender.hasPermission(getPermission());
     }
 
-    public boolean onConsoleDispatch(ConsoleCommandSender sender, String[] args) {
+    public CommandResult onConsoleDispatch(ConsoleCommandSender sender, String[] args) {
         throw new NotImplementedException();
     }
 
-    public boolean onPlayerDispatch(Player sender, String[] args) {
+    public CommandResult onPlayerDispatch(Player sender, String[] args) {
         throw new NotImplementedException();
     }
 
-    public boolean onDispatch(CommandSender sender, String[] args) {
+    public CommandResult onDispatch(CommandSender sender, String[] args) {
         throw new NotImplementedException();
     }
 
