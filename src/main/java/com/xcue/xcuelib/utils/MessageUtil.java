@@ -8,6 +8,8 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MessageUtil {
     private static Config cfg;
@@ -31,7 +33,7 @@ public class MessageUtil {
     public static List<TextComponent> getMessages(String path) {
         List<TextComponent> components = new ArrayList<>();
         //noinspection unchecked
-        List<String> strings = new ArrayList<String>(getCfg(path, ArrayList.class, new ArrayList<>()));
+        List<String> strings = new ArrayList<>(getCfg(path, ArrayList.class, new ArrayList<>()));
 
         for (String str : strings) {
             components.add(toCmp(str));
@@ -42,7 +44,7 @@ public class MessageUtil {
 
     public static List<String> getMessageStrs(String path) {
         //noinspection unchecked
-        return new ArrayList<String>(getCfg(path, ArrayList.class, new ArrayList<>()));
+        return new ArrayList<>(getCfg(path, ArrayList.class, new ArrayList<>()));
     }
 
     public static String toStr(Component comp) {
@@ -50,6 +52,7 @@ public class MessageUtil {
     }
 
     public static TextComponent toCmp(String str) {
+        str = parseHex(str);
         return (TextComponent) normalizeItalics(LegacyComponentSerializer.legacyAmpersand().deserialize(str));
     }
 
@@ -65,5 +68,30 @@ public class MessageUtil {
         }
 
         return component.children(newChildren);
+    }
+
+    private static final Pattern HEX_PATTERN = Pattern.compile("<#([0-9A-Fa-f]{6})>");
+
+    private static String parseHex(String input) {
+        Matcher matcher = HEX_PATTERN.matcher(input);
+        StringBuilder sb = new StringBuilder();
+        int lastIndex = 0;
+
+        while (matcher.find()) {
+            // Append text before this hex tag
+            if (matcher.start() > lastIndex) {
+                sb.append(input, lastIndex, matcher.start());
+            }
+            // Replace hex tag with LegacyComponentSerializer hex format
+            sb.append("&#").append(matcher.group(1));
+            lastIndex = matcher.end();
+        }
+
+        // Append remaining text
+        if (lastIndex < input.length()) {
+            sb.append(input.substring(lastIndex));
+        }
+
+        return sb.toString();
     }
 }

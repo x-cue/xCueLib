@@ -65,4 +65,12 @@ public class LocationUtils {
     public static Location deserializeLocation(@NonNull String location) {
         return deserializeLocation(location, false);
     }
+
+    public static boolean areSameBlock(Location a, Location b) {
+        if (a == null || b == null) return false;
+        if (!a.getWorld().getName().equals(b.getWorld().getName())) return false;
+        return a.getBlockX() == b.getBlockX()
+                && a.getBlockY() == b.getBlockY()
+                && a.getBlockZ() == b.getBlockZ();
+    }
 }
